@@ -1,27 +1,33 @@
 import pika
+import config
 
 # RabbitMQ connection details (replace with yours)
 connection_parameters = pika.ConnectionParameters(
-    host='localhost',
+    host="localhost",
     port=5672,
-    virtual_host='/',  # Replace with your virtual host if using one
-    credentials=pika.PlainCredentials('bhavith', '1234')
+    virtual_host="/",  # Replace with your virtual host if using one
+    credentials=pika.PlainCredentials("bhavith", "1234"), #This is Optional/ use this only if there is credentials
 )
 
 # Connect to RabbitMQ
 connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
 
-# Define the exchange and routing key (optional, adjust as needed)
-exchange_name = 'my_exchange'  # Replace with your desired exchange name
-routing_key = 'TEST_ROUTING_KEY'  # Replace with the message you want to listen for
+# Creating a Queue
+channel.queue_declare(queue=config.MESSAGE_QUEUE_NAME)
 
 # Message to publish
-message = "This is the message to trigger the task!"
+message = "Hello Test Queue!"
 
 # Publish the message
-channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message.encode())
+channel.basic_publish(
+    exchange=config.MESSAGE_EXCHANGE_NAME,
+    routing_key=config.MESSAGE_QUEUE_NAME,
+    body=message,
+)
 
-print(f"Message published to exchange '{exchange_name}' with routing key '{routing_key}'")
+print(
+    f"Message published to exchange '{config.MESSAGE_EXCHANGE_NAME}' with routing key '{config.MESSAGE_QUEUE_NAME}'"
+)
 
 connection.close()
