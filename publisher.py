@@ -16,7 +16,8 @@ connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
 
 # Creating a Queue
-channel.queue_declare(queue=config.MESSAGE_QUEUE_NAME, durable=True)
+# channel.queue_declare(queue=config.MESSAGE_QUEUE_NAME, durable=True)
+channel.exchange_declare(exchange=config.MESSAGE_EXCHANGE_NAME, exchange_type="fanout")
 
 # Message to publish
 message = "Hello Test Queue 111!"
@@ -26,7 +27,9 @@ channel.basic_publish(
     exchange=config.MESSAGE_EXCHANGE_NAME,
     routing_key=config.MESSAGE_QUEUE_NAME,
     body=message,
-    properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent), #Optional Persist data
+    properties=pika.BasicProperties(
+        delivery_mode=pika.DeliveryMode.Persistent
+    ),  # Optional Persist data
 )
 
 print(

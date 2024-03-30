@@ -21,7 +21,13 @@ channel = connection.channel()
 
 
 # Declare a queue to receive messages (optional, adjust as needed)
-channel.queue_declare(config.MESSAGE_QUEUE_NAME, durable=True)
+# channel.queue_declare(config.MESSAGE_QUEUE_NAME, durable=True)
+channel.exchange_declare(exchange=config.MESSAGE_EXCHANGE_NAME, exchange_type="fanout")
+
+result = channel.queue_declare(queue=config.MESSAGE_QUEUE_NAME, exclusive=True)
+queue_name = result.method.queue
+
+channel.queue_bind(exchange=config.MESSAGE_EXCHANGE_NAME, queue=queue_name)
 
 # Bind the queue to the exchange with the specified routing key
 # channel.queue_bind(exchange=config.MESSAGE_EXCHANGE_NAME, queue=queue_name, routing_key=routing_key)
